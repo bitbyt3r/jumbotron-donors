@@ -2,30 +2,66 @@
     <head>
         <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
         <style>
+            @font-face {
+                font-family: 'microgram';
+                src: url('microgramDBRegular.ttf')  format('truetype');
+            }
             body {
-                width: 500px;
+                width: 3840px;
+                height: 1080px;
                 background-color: grey;
+                background-image: url("background_jumbo.png");
             }
-            .label {
-                text-align: center;
-                font-size: 40px;
-                -webkit-text-stroke-width: 1px;
-                -webkit-text-stroke-color: white;
-                font-family: 'Fredoka One', cursive;
-            }
-            .amount {
+            .slide {
+                position: absolute;
+                top: 250px;
+                left: 450px;
+                height: 800px;
+                width: 1300px;
+                font-family: 'microgram';
                 font-size: 50px;
+                color: white;
+                text-shadow: 0 0 8px #FFF;
+                transform: translateX(-25%);
+                opacity: 0;
+            }
+            #message {
+                font-size: 35px;
+                text-shadow: 0 0 2px #FFF;
+                padding-top: 50px;
+            }
+
+            .slide-in {
+                animation: slide-in 5s forwards;
+            }
+            @keyframes slide-in {
+                10% {
+                    transform: translateX(0%);
+                    opacity: 1;
+                }
+                90% {
+                    transform: translateX(0%);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(25%);
+                    opacity: 0;
+                }
             }
         </style>
     </head>
     <body>
-        <div id="donation"></div>
-        <div id="message"></div>
+        <div id="frame" class="slide slide-in">
+            <div id="name">Mark Murnane</div>
+            <div id="message">Please enjoy my money</div>
+        </div>
+
         <script type="text/javascript">
             let idx = 0;
             let donations = [];
-            let el = document.getElementById("donation");
-            let msg = document.getElementById("message");
+            let frameel = document.getElementById("frame")
+            let nameel = document.getElementById("name");
+            let msgel = document.getElementById("message");
             let string = "";
             let string_pos = 0;
             let interval = 0;
@@ -36,14 +72,6 @@
                 setInterval(show_donation, 5000);
             }
 
-            function show_character() {
-                if (string_pos < string.length) {
-                    string_pos++;
-                    el.innerHTML = string.slice(0, string_pos);
-                    setTimeout(show_character, interval)
-                }
-            }
-
             function show_donation() {
                 if (idx >= donations.length) {
                     idx = 0;
@@ -51,21 +79,11 @@
                 let donation = donations[idx]
                 idx++;
 
-                while (donation.Status !== "succeeded") {
-                    if (idx >= donations.length) {
-                        idx = 0;
-                    }
-                    donation = donations[idx]
-                    idx++;
-                }
-
-                msg.innerHTML = donation['Public Message'];
-
-                el.innerHTML = "&nbsp;";
-                string = donation['Public Name'] + " - $" + donation['Effective Donation'];
-                string_pos = 0;
-                interval = 2000 / string.length;
-                setTimeout(show_character, interval);
+                nameel.innerHTML = donation['Public Name'];
+                msgel.innerHTML = donation['Public Message'];
+                frameel.classList.remove("slide-in");
+                void frameel.offsetWidth;
+                frameel.classList.add("slide-in");
             }
 
             fetch('donors.csv.json')
