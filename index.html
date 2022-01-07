@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+        <style>
+            body {
+                width: 500px;
+                background-color: grey;
+            }
+            .label {
+                text-align: center;
+                font-size: 40px;
+                -webkit-text-stroke-width: 1px;
+                -webkit-text-stroke-color: white;
+                font-family: 'Fredoka One', cursive;
+            }
+            .amount {
+                font-size: 50px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="donation"></div>
+        <div id="message"></div>
+        <script type="text/javascript">
+            let idx = 0;
+            let donations = [];
+            let el = document.getElementById("donation");
+            let msg = document.getElementById("message");
+            let string = "";
+            let string_pos = 0;
+            let interval = 0;
+
+            function show_donations(data) {
+                donations = data;
+                show_donation();
+                setInterval(show_donation, 5000);
+            }
+
+            function show_character() {
+                if (string_pos < string.length) {
+                    string_pos++;
+                    el.innerHTML = string.slice(0, string_pos);
+                    setTimeout(show_character, interval)
+                }
+            }
+
+            function show_donation() {
+                if (idx >= donations.length) {
+                    idx = 0;
+                }
+                let donation = donations[idx]
+                idx++;
+
+                while (donation.Status !== "succeeded") {
+                    if (idx >= donations.length) {
+                        idx = 0;
+                    }
+                    donation = donations[idx]
+                    idx++;
+                }
+
+                msg.innerHTML = donation['Public Message'];
+
+                el.innerHTML = "&nbsp;";
+                string = donation['Public Name'] + " - $" + donation['Effective Donation'];
+                string_pos = 0;
+                interval = 2000 / string.length;
+                setTimeout(show_character, interval);
+            }
+
+            fetch('donors.csv.json')
+                .then(response => response.json())
+                .then(data => show_donations(data));
+        </script>
+    </body>
+</html>
